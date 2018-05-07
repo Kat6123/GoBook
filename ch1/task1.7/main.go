@@ -9,13 +9,21 @@ package main
 
 import (
 	"fmt"
-	"io"
-	"net/http"
 	"os"
+	"strings"
+	"net/http"
+	"io"
 )
+
+const httpPrefix  = "http://"
 
 func main() {
 	for _, url := range os.Args[1:] {
+		// Check if url has "http://" prefix
+		if !(strings.HasPrefix(url, httpPrefix)){
+			url = fmt.Sprintf("%s%s", httpPrefix, url)
+		}
+		// Get
 		resp, err := http.Get(url)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "fetch: %s\n", err)
