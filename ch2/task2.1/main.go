@@ -12,7 +12,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/Kat6123/GoBook/tempconv"
+	"github.com/Kat6123/GoBook/ch2/task2.1/tempconv"
 	"log"
 )
 
@@ -24,29 +24,23 @@ func main() {
 			log.Printf("can't parse float: %v\n", err)
 			continue
 		}
+
 		c := tempconv.Celsius(t)
-		if !tempconv.ValidTemp(c){
+
+		cTof, err := tempconv.CToF(c)
+		if err != nil{
 			log.Printf("%s not valid temperature", c)
 			continue
 		}
-		fmt.Printf("%s: %s, %s\n",
-			c, tempconv.CToF(c), tempconv.CToK(c))
+		fmt.Printf("%s: %s\n", c, cTof)
 
-		k := tempconv.Kelvin(t)
-		if !tempconv.ValidTemp(k){
-			log.Printf("%s not valid temperature", k)
+		cTok, err := tempconv.CToK(c);
+		if err != nil{
+			log.Printf("%s not valid temperature", c)
 			continue
 		}
-		fmt.Printf("%s: %s, %s\n",
-			k, tempconv.KToC(k), tempconv.KToF(k))
+		fmt.Printf("%s: %s\n", c, cTok)
 
-		f := tempconv.Fahrenheit(t)
-		if !tempconv.ValidTemp(f){
-			log.Printf("%s not valid temperature", f)
-			continue
-		}
-		fmt.Printf("%s: %s, %s\n\n",
-			f, tempconv.FToC(f), tempconv.FToK(f))
 	}
 }
 
