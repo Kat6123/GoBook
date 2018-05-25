@@ -4,132 +4,141 @@ import (
 	"testing"
 )
 
-// Need I test for mass string if massUnit already pass tests?
-func TestMass_String(t *testing.T) {
-	tt := []struct {
-		m   mass
-		str string
-	}{
-		{mass{5, microgr}, "5 mcgr"},
-		{mass{10, milligr}, "10 mlgr"},
-		{mass{15, gram}, "15 gr"},
-		{mass{20, kilogr}, "20 kg"},
-		{mass{25, centner}, "25 centner"},
-		{mass{30, ton}, "30 ton"},
-		{mass{35, massUnit(123)}, "35 not defined"},
-	}
-
-	for _, tc := range tt {
-		tr := tc.m.String()
-		if tr != tc.str {
-			t.Errorf("string should be %v; got %v", tc.str, tr)
-		}
-	}
-}
-
-func TestMassUnit_String(t *testing.T) {
-	tt := []struct {
-		unit massUnit
-		str  string
-	}{
-		{microgr, "mcgr"},
-		{milligr, "mlgr"},
-		{gram, "gr"},
-		{kilogr, "kg"},
-		{centner, "centner"},
-		{ton, "ton"},
-		{massUnit(123), "not defined"},
-	}
-
-	for _, tc := range tt {
-		tr := tc.unit.String()
-		if tr != tc.str {
-			t.Errorf("string should be %v; got %v", tc.str, tr)
-		}
-	}
-}
-
-func TestMass_convert(t *testing.T) {
-	tt := []struct {
-		m     mass
-		unit  massUnit
-		value float64
-	}{
-		{mass{5, gram}, microgr, 5e6},
-		{mass{5, gram}, milligr, 5e3},
-		{mass{5, gram}, gram, 5},
-		{mass{5, gram}, kilogr, 5e-3},
-		{mass{5, gram}, centner, 5e-5},
-		{mass{5, gram}, ton, 5e-6},
-		{mass{5, gram}, massUnit(123), 5. / 123},
-	}
-
-	for _, tc := range tt {
-		m := tc.m
-		m.convert(tc.unit)
-		if m.value != tc.value {
-			t.Errorf("converted value should be %v; got %v", tc.value, m.value)
-		}
-	}
-}
-
-func TestMass_toVolume(t *testing.T) {
-	tt := []struct {
-		m     mass
-		unit  volumeUnit
-		value float64
-	}{
-		{mass{5, kilogr}, millim3, 5e6},
-		{mass{5, gram}, mll, 5.},
-		{mass{5, kilogr}, litr, 5.},
-		{mass{5, gram}, metr3, 5e-6},
-	}
-
-	for _, tc := range tt {
-		v := tc.m.toVolume(tc.unit)
-		// XXX should get 5 by get 5.0001
-		if float32(v.value) != float32(tc.value) {
-			t.Errorf("converted value of %s should be %v in %s; got %v", tc.m, tc.value, tc.unit, v.value)
-		}
-	}
-}
-
 func TestMass_convertTo(t *testing.T) {
 	tt := []struct {
-		m     mass
-		unit  interface{}
-		value interface{}
-		err   string
+		testName       string
+		m              mass
+		unit           interface{}
+		expectedValue  interface{}
+		expectedErrMsg string
 	}{
-		{mass{5, kilogr}, millim3,
+		{"mass to volume", mass{5, kilogr}, millim3,
 			volume{5e6, millim3}, ""},
-		{mass{5, gram}, milligr,
+		{"mass to mass", mass{5, gram}, milligr,
 			mass{5e3, milligr}, ""},
-		{mass{5, gram}, 5,
-			nil, "cann't convert value of first unit type int"},
+		{"mass to undefined unit", mass{5, gram}, 5,
+			nil, "cann't convert value to unit type int"},
+		{"mass to nil", mass{5, gram}, nil,
+			nil, "cann't convert value to unit type <nil>"},
 	}
 
 	for _, tc := range tt {
-		val, err := tc.m.convertTo(tc.unit)
-		if err != nil{
-			if err.Error() != tc.err{
-				// XXX
-				t.Errorf("wrong error msg %s", err.Error())
-			}
-			continue
-		}
-
-		switch v := val.(type) {
-		case mass:
-				if v != tc.value{
-					t.Errorf("wrong mass value %s", v)
+		t.Run(tc.testName, func(t *testing.T) {
+			val, err := tc.m.convertTo(tc.unit)
+			// If return error with non nil value? How to test
+			if err != nil {
+				if err.Error() != tc.expectedErrMsg {
+					t.Fatalf("error should be %q; get %q", tc.expectedErrMsg, err)
 				}
-		case volume:
-			if v != tc.value{
-				t.Errorf("wrong volume value %s", v)
 			}
-		default:
-			t.Errorf("wrong type %T", v)
-		}
+
+			// If val != nil?
+			if val != nil {
+				switch v := val.(type) {
+				case mass:
+					if v != tc.expectedValue {
+						t.Fatalf("should be value %v of type %[1]T; get %v of type %[2]T", tc.expectedValue, v)
+					}
+				case volume:
+					if v != tc.expectedValue {
+						t.Fatalf("should be value %v of type %[1]T; get %v of type %[2]T", tc.expectedValue, v)
+					}
+				default:
+					t.Fatalf("should be value %v of type %[1]T; get %v of type %[2]T", tc.expectedValue, v)
+				}
+			}
+		})
+	}
+}
+
+func TestVolume_convertTo(t *testing.T) {
+	tt := []struct {
+		testName       string
+		m              volume
+		unit           interface{}
+		expectedValue  interface{}
+		expectedErrMsg string
+	}{
+		{"volume to volume", volume{5, litr}, litr,
+			volume{5, litr}, ""},
+		{"volume to mass", volume{5, litr}, kilogr,
+			mass{5, kilogr}, ""},
+		{"volume to undefined unit", volume{5, millim3}, 5,
+			nil, "cann't convert value to unit type int"},
+		{"volume to nil", volume{5, millim3}, nil,
+			nil, "cann't convert value to unit type <nil>"},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			val, err := tc.m.convertTo(tc.unit)
+			if err != nil {
+				if err.Error() != tc.expectedErrMsg {
+					t.Fatalf("error should be %q; get %q", tc.expectedErrMsg, err)
+				}
+			}
+
+			// If val != nil?
+			if val != nil {
+				switch v := val.(type) {
+				case mass:
+					if v != tc.expectedValue {
+						t.Fatalf("should be value %v of type %[1]T; get %v of type %[2]T", tc.expectedValue, v)
+					}
+				case volume:
+					if v != tc.expectedValue {
+						t.Fatalf("should be value %v of type %[1]T; get %v of type %[2]T", tc.expectedValue, v)
+					}
+				default:
+					t.Fatalf("should be value %v of type %[1]T; get %v of type %[2]T", tc.expectedValue, v)
+				}
+			}
+		})
+	}
+}
+
+func Test_convert(t *testing.T){
+	tt := []struct {
+		testName       string
+		v              interface{}
+		unit           interface{}
+		expectedValue  interface{}
+		expectedErrMsg string
+	}{
+		{"volume to volume", volume{5, litr}, litr,
+			volume{5, litr}, ""},
+		{"undefined to mass", 5, kilogr,
+			nil, "cann't convert value of type int"},
+		{"volume to undefined unit", volume{5, millim3}, 5,
+			nil, "cann't convert value to unit type int"},
+		{"nil to nil", nil, nil,
+			nil, "cann't convert value of type <nil>"},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testName, func(t *testing.T) {
+			val, err := convert(tc.v, tc.unit)
+			if err != nil {
+				if err.Error() != tc.expectedErrMsg {
+					t.Fatalf("error should be %q; get %q", tc.expectedErrMsg, err)
+				}
+			}
+
+			// If val != nil?
+			if val != nil {
+				switch v := val.(type) {
+				case mass:
+					if v != tc.expectedValue {
+						t.Fatalf("should be value %v of type %[1]T; get %v of type %[2]T", tc.expectedValue, v)
+					}
+				case volume:
+					if v != tc.expectedValue {
+						t.Fatalf("should be value %v of type %[1]T; get %v of type %[2]T", tc.expectedValue, v)
+					}
+				default:
+					t.Fatalf("should be value %v of type %[1]T; get %v of type %[2]T", tc.expectedValue, v)
+				}
+			}
+		})
 	}
 }
