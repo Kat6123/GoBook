@@ -28,7 +28,7 @@ outer:
 		var ints [arrLen]int
 		i := 0
 		for _, s := range strings.Fields(input.Text()) {
-			if i >= arrLen{
+			if i >= arrLen {
 				break
 			}
 			x, err := strconv.ParseInt(s, 10, 64)
@@ -47,7 +47,9 @@ outer:
 
 // I can access elements without (*s)[i]
 func reverse(s *[arrLen]int) {
-	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+	for i, j := 0, len(s)-1;
+	i < j;
+	i, j = i+1, j-1 {
 		s[i], s[j] = s[j], s[i]
 	}
 }

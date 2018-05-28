@@ -23,6 +23,9 @@ func (m mass) convert(unit massUnit) mass {
 // toVolume returns volume converted from mass
 func (m mass) toVolume(unit volumeUnit) volume {
 	mConv := m.convert(kilogr)
-	v := volume{value: mConv.value / 1000, unit: metr3}
+	v := volume{
+		value: mConv.value / 1000,
+		unit: metr3,
+	}
 	return v.convert(unit)
 }

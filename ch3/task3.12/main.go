@@ -18,9 +18,10 @@ func main() {
 }
 
 // isAnagram check if strings consist of the same letters
-func isAnagram(s1 string, s2 string) bool{
-	for _, r := range s2{
-		if !strings.ContainsRune(s1, r){
+func isAnagram(s1 string, s2 string) bool {
+	// Sometimes better to use s[i] and range only by index
+	for _, r := range s2 {
+		if !strings.ContainsRune(s1, r) {
 			return false
 		}
 	}
@@ -28,16 +29,17 @@ func isAnagram(s1 string, s2 string) bool{
 }
 
 // isReversed check if second string is reversed version of first
-func isReversed(s1 string, s2 string) bool{
+func isReversed(s1 string, s2 string) bool {
 	r1, r2 := []rune(s1), []rune(s2)
 	l1, l2 := len(r1), len(r2)
 
-	if l1 != l2{
+	if l1 != l2 {
 		return false
 	}
 
-	for i := 0; i < l1 / 2; i++{
-		if r1[i] != r2[l2 - 1 - i] || r2[i] != r1[l1 - 1 - i]{
+	for i := 0; i < l1/2; i++ {
+		if r1[i] != r2[l2-1-i] ||
+			r2[i] != r1[l1-1-i] {
 			return false
 		}
 	}

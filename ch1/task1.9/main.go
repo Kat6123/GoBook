@@ -9,17 +9,17 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
-	"net/http"
 )
 
-const httpPrefix  = "http://"
+const httpPrefix = "http://"
 
 func main() {
 	for _, url := range os.Args[1:] {
 		// Check if url has "http://" prefix
-		if !(strings.HasPrefix(url, httpPrefix)){
+		if !strings.HasPrefix(url, httpPrefix) {
 			url = fmt.Sprintf("%s%s", httpPrefix, url)
 		}
 		// Get
@@ -29,6 +29,7 @@ func main() {
 			//os.Exit(1)
 			continue
 		}
+		defer resp.Body.Close()
 		fmt.Printf("%s Status code: %d\n", url, resp.StatusCode)
 	}
 }

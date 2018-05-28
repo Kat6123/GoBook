@@ -144,7 +144,7 @@ func TestAssertErr_convert(t *testing.T) {
 		t.Run(tc.testName, func(t *testing.T) {
 			val, err := convert(tc.v, tc.unit)
 
-			if assert.EqualError(t, err, tc.expectedErrMsg){
+			if assert.EqualError(t, err, tc.expectedErrMsg) {
 				assert.Nil(t, val)
 			}
 		})

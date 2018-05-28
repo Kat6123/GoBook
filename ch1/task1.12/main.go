@@ -21,11 +21,11 @@ import (
 //!-main
 // Packages not needed by version in book.
 import (
+	"fmt"
 	"log"
 	"net/http"
-	"time"
 	"strconv"
-	"fmt"
+	"time"
 )
 
 //!+main
@@ -33,8 +33,7 @@ import (
 var palette = []color.Color{color.White, color.Black}
 
 const (
-	cycles = 5
-	whiteIndex = 0 // first color in palette
+	cycles     = 5
 	blackIndex = 1 // next color in palette
 )
 
@@ -50,22 +49,22 @@ func main() {
 		handler := func(w http.ResponseWriter, r *http.Request) {
 			lissajousCycles := cycles
 
-			queryCycles := r.URL.Query()["cycles"]
-			if queryCycles != nil {
+			queryCycles, ok := r.URL.Query()["cycles"]
+			if ok {
 				res, err := strconv.Atoi(queryCycles[0])
-				fmt.Printf("%v", err)
-				if err == nil {
-					lissajousCycles = res
+				if err != nil {
+					log.Printf("could not convert cycles to integer: %v", err)
+					return
+				}
+				lissajousCycles = res
 				//? where to write?
 				// log info
-				}
 			}
 			lissajous(w, lissajousCycles)
 		}
 		http.HandleFunc("/", handler)
 		//!-http
-		log.Fatal(http.ListenAndServe("localhost:8000", nil))
-		return
+		log.Fatal(http.ListenAndServe(":8000", nil))
 	}
 	//!+main
 	lissajous(os.Stdout, cycles)

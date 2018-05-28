@@ -97,7 +97,7 @@ func TestVolume_convertTo(t *testing.T) {
 	}
 }
 
-func Test_convert(t *testing.T){
+func Test_convert(t *testing.T) {
 	tt := []struct {
 		testName       string
 		v              interface{}

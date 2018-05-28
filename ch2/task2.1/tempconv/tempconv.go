@@ -14,20 +14,20 @@ type Kelvin float64
 
 const (
 	AbsoluteZeroC Celsius = -273.15
-	AbsoluteZeroF = -459.67
-	AbsoluteZeroK = 0
+	AbsoluteZeroF         = -459.67
+	AbsoluteZeroK         = 0
 	FreezingC     Celsius = 0
 	BoilingC      Celsius = 100
 )
 
-func (c Celsius) String() string    {
+func (c Celsius) String() string {
 	return fmt.Sprintf("%g°C", c)
 }
 
 func (f Fahrenheit) String() string {
 	return fmt.Sprintf("%g°F", f)
 }
-func (k Kelvin) String() string     {
+func (k Kelvin) String() string {
 	return fmt.Sprintf("%gK", k)
 }
 

@@ -28,14 +28,14 @@ func main() {
 		c := tempconv.Celsius(t)
 
 		cTof, err := tempconv.CToF(c)
-		if err != nil{
+		if err != nil {
 			log.Printf("%s not valid temperature", c)
 			continue
 		}
 		fmt.Printf("%s: %s\n", c, cTof)
 
-		cTok, err := tempconv.CToK(c);
-		if err != nil{
+		cTok, err := tempconv.CToK(c)
+		if err != nil {
 			log.Printf("%s not valid temperature", c)
 			continue
 		}
