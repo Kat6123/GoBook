@@ -13,10 +13,13 @@ func main() {
 		"ad",
 		"ad",
 		"ad",
+		"m",
+		"m",
 	}
 
 	//tc = unique(tc)
-	//tc = optimizedUnique(tc)
+	tc = optimizedUnique(tc)
+	//tc = optimizedUniqueWrong(tc)
 	fmt.Println(tc)
 }
 
@@ -34,12 +37,12 @@ func unique(s []string) []string {
 	return s[:i]
 }
 
-func optimizedUnique(s []string) []string {
+func optimizedUniqueWrong(s []string) []string {
 	duplicate := false
 	i := 1
 	for j := 0; i < len(s); i++ {
 		if duplicate && s[i] != s[i-1] {
-			copy(s[j + 1:], s[i:])
+			copy(s[j+1:], s[i:])
 			s = s[:len(s)-(i-j)]
 			continue
 		}
@@ -50,4 +53,16 @@ func optimizedUnique(s []string) []string {
 	}
 
 	return s[:i]
+}
+
+func optimizedUnique(s []string) []string {
+	writePtr := 1
+	readPtr := 1
+	for ; readPtr < len(s); readPtr++ {
+		if s[readPtr] != s[readPtr-1] {
+			s[writePtr] = s[readPtr]
+			writePtr++
+		}
+	}
+	return s[:writePtr]
 }
