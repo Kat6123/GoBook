@@ -8,8 +8,10 @@ import (
 	"golang.org/x/net/html"
 )
 
+type links map[string][]string
+
 // visit appends to links each link found in n, and returns the result.
-func visit(links map[string][]string, n *html.Node) {
+func visit(links links, n *html.Node) {
 	if n.Type == html.ElementNode {
 		switch n.Data {
 		case "a":
@@ -30,16 +32,16 @@ func visit(links map[string][]string, n *html.Node) {
 	}
 }
 
-func isCSS(n *html.Node) (isCSS bool) {
+func isCSS(n *html.Node) bool {
 	for _, a := range n.Attr {
 		if a.Key == "rel" && a.Val == "stylesheet" {
 			return true
 		}
 	}
-	return
+	return false
 }
 
-func appendLink(element, ref string, n *html.Node, links map[string][]string) {
+func appendLink(element, ref string, n *html.Node, links links) {
 	for _, a := range n.Attr {
 		if a.Key == ref {
 			links[element] = append(links[element], a.Val)
@@ -50,14 +52,14 @@ func appendLink(element, ref string, n *html.Node, links map[string][]string) {
 //!+
 func main() {
 	for _, url := range os.Args[1:] {
-		links := map[string][]string{}
-		if err := findLinks(links, url); err != nil {
+		l := links{}
+		if err := findLinks(l, url); err != nil {
 			fmt.Fprintf(os.Stderr, "findlinks2: %v\n", err)
 			continue
 		}
-		for linkType := range links {
-			for i := range links[linkType] {
-				fmt.Printf("%s: %s\n", linkType, links[linkType][i])
+		for linkType := range l {
+			for i := range l[linkType] {
+				fmt.Printf("%s: %s\n", linkType, l[linkType][i])
 			}
 		}
 	}
@@ -65,17 +67,16 @@ func main() {
 
 // findLinks performs an HTTP GET request for url, parses the
 // response as HTML, and extracts and returns the links.
-func findLinks(links map[string][]string, url string) error {
+func findLinks(links links, url string) error {
 	resp, err := http.Get(url)
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		resp.Body.Close()
 		return fmt.Errorf("getting %s: %s", url, resp.Status)
 	}
 	doc, err := html.Parse(resp.Body)
-	resp.Body.Close()
 	if err != nil {
 		return fmt.Errorf("parsing %s as HTML: %v", url, err)
 	}
