@@ -1,0 +1,19 @@
+<table>
+    <tr style='text-align: left'>
+        <th>Login</th>
+        <th>Type</th>
+        <th>Admin</th>
+        <th>Contributions</th>
+    </tr>
+{{range .Contributors   }}
+    <tr>
+        <td><a href='{{.Url}}'>{{.Login}}</a></td>
+        <td>{{.Type}}</td>
+        <td>{{if .Admin}}yes{{end}}</td>
+        <td>{{.Contributions}}</td>
+    </tr>
+{{end}}
+</table>
+
+<a href ='/contributors?page={{.CurrentNumber}}'>current</a>
+<a href ='/contributors?page={{.TotalNumber}}'>Last</a>
