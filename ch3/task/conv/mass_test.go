@@ -1,8 +1,12 @@
 package main
 
-import "testing"
+import (
+	"testing"
 
-func TestMass_String(t *testing.T) {
+	"github.com/stretchr/testify/assert"
+)
+
+func TestAssertMass_String(t *testing.T) {
 	tt := []struct {
 		m           mass
 		expectedStr string
@@ -13,14 +17,12 @@ func TestMass_String(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		tr := tc.m.String()
-		if tr != tc.expectedStr {
-			t.Errorf("string should be %v; got %v", tc.expectedStr, tr)
-		}
+		actual := tc.m.String()
+		assert.Equal(t, tc.expectedStr, actual, "should be equal")
 	}
 }
 
-func TestMass_convert(t *testing.T) {
+func TestAssertMass_convert(t *testing.T) {
 	// I don't handle negative values
 	tt := []struct {
 		testName     string
@@ -47,15 +49,13 @@ func TestMass_convert(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
 			m := tc.m
-			mConv := m.convert(tc.unit)
-			if mConv != tc.expectedMass {
-				t.Fatalf("converted value should be %v; got %v", tc.expectedMass, mConv)
-			}
+			actual := m.convert(tc.unit)
+			assert.Equal(t, tc.expectedMass, actual)
 		})
 	}
 }
 
-func TestMass_toVolume(t *testing.T) {
+func TestAssertMass_toVolume(t *testing.T) {
 	tt := []struct {
 		testName    string
 		m           mass
@@ -76,10 +76,7 @@ func TestMass_toVolume(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
-			v := tc.m.toVolume(tc.unit)
-			if v != tc.expectedVol {
-				t.Fatalf("converted value of %s should be %s; got %s", tc.m, tc.expectedVol, v)
-			}
+			assert.Equal(t, tc.expectedVol, tc.m.toVolume(tc.unit))
 		})
 	}
 }

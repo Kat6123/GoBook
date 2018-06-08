@@ -1,8 +1,12 @@
 package main
 
-import "testing"
+import (
+	"testing"
 
-func TestMassUnit_String(t *testing.T) {
+	"github.com/stretchr/testify/assert"
+)
+
+func TestAssertMassUnit_String(t *testing.T) {
 	tt := []struct {
 		unit        massUnit
 		expectedStr string
@@ -17,14 +21,12 @@ func TestMassUnit_String(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		tr := tc.unit.String()
-		if tr != tc.expectedStr {
-			t.Errorf("string should be %v; got %v", tc.expectedStr, tr)
-		}
+		actual := tc.unit.String()
+		assert.Equal(t, tc.expectedStr, actual, "should be equal")
 	}
 }
 
-func TestVolumeUnit_String(t *testing.T) {
+func TestAssertVolumeUnit_String(t *testing.T) {
 	tt := []struct {
 		unit        volumeUnit
 		expectedStr string
@@ -37,9 +39,7 @@ func TestVolumeUnit_String(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		tr := tc.unit.String()
-		if tr != tc.expectedStr {
-			t.Errorf("string should be %v; got %v", tc.expectedStr, tr)
-		}
+		actual := tc.unit.String()
+		assert.Equal(t, tc.expectedStr, actual, "should be equal")
 	}
 }

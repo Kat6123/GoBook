@@ -1,8 +1,12 @@
 package main
 
-import "testing"
+import (
+	"testing"
 
-func TestVolume_String(t *testing.T) {
+	"github.com/stretchr/testify/assert"
+)
+
+func TestAssertVolume_String(t *testing.T) {
 	tt := []struct {
 		v           volume
 		expectedStr string
@@ -13,14 +17,11 @@ func TestVolume_String(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		tr := tc.v.String()
-		if tr != tc.expectedStr {
-			t.Errorf("string should be %v; got %v", tc.expectedStr, tr)
-		}
+		assert.Equal(t, tc.expectedStr, tc.v.String(), "should be equal")
 	}
 }
 
-func TestVolume_convert(t *testing.T) {
+func TestAssertVolume_convert(t *testing.T) {
 	// Float values?
 	tt := []struct {
 		testName       string
@@ -42,16 +43,12 @@ func TestVolume_convert(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
-			v := tc.v
-			vConv := v.convert(tc.unit)
-			if vConv != tc.expectedVolume {
-				t.Fatalf("converted value should be %v; got %v", tc.expectedVolume, vConv)
-			}
+			assert.Equal(t, tc.expectedVolume, tc.v.convert(tc.unit))
 		})
 	}
 }
 
-func TestVolume_toMass(t *testing.T) {
+func TestAssertVolume_toMass(t *testing.T) {
 	tt := []struct {
 		testName     string
 		v            volume
@@ -76,10 +73,7 @@ func TestVolume_toMass(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.testName, func(t *testing.T) {
-			m := tc.v.toMass(tc.unit)
-			if m != tc.expectedMass {
-				t.Fatalf("converted value of %s should be %s; got %s", tc.v, tc.expectedMass, m)
-			}
+			assert.Equal(t, tc.expectedMass, tc.v.toMass(tc.unit))
 		})
 	}
 }
