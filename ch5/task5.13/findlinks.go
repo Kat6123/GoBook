@@ -142,6 +142,7 @@ func buildPath(urlPath string) (dir, file string) {
 		return dir, linkPath
 	}
 }
+
 func main() {
 	// Crawl the web breadth-first,
 	// starting from the command-line arguments.
