@@ -97,7 +97,7 @@ func createDir(dir string) error {
 	return nil
 }
 
-func saveURL(url, dest string) error {
+func saveURL(url, dest string) (err error) {
 	if pageCount >= maxPageCount {
 		// The crawl ends after it has visited all links in the queue.
 		// It can work with error for a long time. Special type of error or Fatalf will be better decision.
@@ -115,7 +115,12 @@ func saveURL(url, dest string) error {
 	if err != nil {
 		return fmt.Errorf("create %s: %v", dest, err)
 	}
-	defer file.Close()
+	// Are there any better way to close the file?
+	defer func() {
+		if closeErr := file.Close(); err == nil {
+			err = closeErr
+		}
+	}()
 
 	// Use io.Copy to just dump the response body to the file.
 	_, err = io.Copy(file, resp.Body)
