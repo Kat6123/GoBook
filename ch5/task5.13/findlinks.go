@@ -3,21 +3,18 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"net/url"
-
 	"os"
-
 	"path/filepath"
 	"strings"
-
-	"io"
-	"net/http"
 
 	"gopl.io/ch5/links"
 )
 
-const maxPageCount = 100
+const maxSeenCount = 100
 
 var (
 	domain    string
@@ -33,6 +30,9 @@ func breadthFirst(f func(item string) []string, worklist []string) {
 		items := worklist
 		worklist = nil
 		for _, item := range items {
+			if len(seen) >= maxSeenCount {
+				break
+			}
 			if !seen[item] {
 				seen[item] = true
 				worklist = append(worklist, f(item)...)
@@ -41,13 +41,22 @@ func breadthFirst(f func(item string) []string, worklist []string) {
 	}
 }
 
-// Do I need to make abstraction under crawl? and pass save as anon func?
 func crawl(rawurl string) []string {
+	u, err := url.Parse(rawurl)
+	if err != nil {
+		log.Printf("parse %s has failed: %v", rawurl, err)
+		return nil
+	}
+
+	if u.Host != domain {
+		log.Printf("%s hasn't valid domain", u.String())
+		return nil
+	}
+
 	log.Printf("visit %s", rawurl)
 
-	if err := save(rawurl); err != nil {
+	if err := save(u); err != nil {
 		log.Printf("save %s as file: %v", rawurl, err)
-		// If an error occurs while saving, then do not follow extracted URLs ?
 		return nil
 	}
 
@@ -60,23 +69,12 @@ func crawl(rawurl string) []string {
 	return list
 }
 
-func save(rawurl string) error {
-	u, err := url.Parse(rawurl)
-	if err != nil {
-		return fmt.Errorf("parse %s to save as html: %v", rawurl, err)
-	}
-	// It's not an error. But if return nil then links will be extracted from this link?
-	if u.Host != domain {
-		log.Printf("%s hasn't valid domain", u.String())
-		return nil
-		//return fmt.Errorf("%s hasn't valid domain", u.String())
-	}
-
+func save(u *url.URL) error {
 	dir, file := buildPath(u.Path)
 	if err := createDir(dir); err != nil {
 		return err
 	}
-	if err := saveURL(rawurl, file); err != nil {
+	if err := saveURL(u.String(), file); err != nil {
 		return err
 	}
 
@@ -91,45 +89,43 @@ func createDir(dir string) error {
 		if err := os.MkdirAll(dir, os.ModePerm); err != nil {
 			return fmt.Errorf("create directory %s: %v", dir, err)
 		}
+		log.Printf("create directory %s", dir)
 	}
 
-	log.Printf("create directory %s", dir)
 	return nil
 }
 
-func saveURL(url, dest string) (err error) {
-	if pageCount >= maxPageCount {
-		// The crawl ends after it has visited all links in the queue.
-		// It can work with error for a long time. Special type of error or Fatalf will be better decision.
-		return fmt.Errorf("max page count %d was reached", maxPageCount)
-	}
-
+func saveURL(url, dest string) error {
 	resp, err := http.Get(url)
 	if err != nil {
 		return fmt.Errorf("get file on %s: %v", url, err)
 	}
 	defer resp.Body.Close()
 
+	if err := write(resp.Body, dest); err != nil {
+		return fmt.Errorf("write to file: %v", err)
+	}
+
+	pageCount++
+	return nil
+}
+
+func write(r io.ReadCloser, dest string) (err error) {
 	// Open a file for writing or truncate the old.
 	file, err := os.Create(dest)
 	if err != nil {
 		return fmt.Errorf("create %s: %v", dest, err)
 	}
-	// Are there any better way to close the file?
-	defer func() {
-		if closeErr := file.Close(); err == nil {
-			err = closeErr
-		}
-	}()
 
 	// Use io.Copy to just dump the response body to the file.
-	_, err = io.Copy(file, resp.Body)
+	_, err = io.Copy(file, r)
 	if err != nil {
-		return fmt.Errorf("copy %s to %s: %v", url, dest, err)
+		err = fmt.Errorf("copy response to %s: %v", dest, err)
 	}
-
-	pageCount++
-	return nil
+	if closeErr := file.Close(); err == nil && closeErr != nil {
+		err = fmt.Errorf("close file %q: %v", dest, closeErr)
+	}
+	return
 }
 
 func buildPath(urlPath string) (dir, file string) {
