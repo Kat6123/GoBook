@@ -5,8 +5,7 @@ package intset
 
 import "fmt"
 
-func Example_one() {
-	//!+main
+func ExampleIntSet_UnionWith() {
 	var x, y IntSet
 	x.Add(1)
 	x.Add(144)
@@ -20,33 +19,53 @@ func Example_one() {
 	x.UnionWith(&y)
 	fmt.Println(x.String()) // "{1 9 42 144}"
 
-	fmt.Println(x.Has(9), x.Has(123)) // "true false"
-	//!-main
-
 	// Output:
 	// {1 9 144}
 	// {9 42}
 	// {1 9 42 144}
-	// true false
 }
 
-func Example_two() {
+func ExampleIntSet_String() {
 	var x IntSet
+
+	fmt.Println(&x)
+
+	x.Add(1)
+	x.Add(2)
+	x.Add(3)
+	fmt.Println(&x)
+
+	// Output:
+	// {}
+	// {1 2 3}
+}
+
+func ExampleIntSet_Has() {
+	var x IntSet
+
+	fmt.Println(x.Has(5))
+
+	x.Add(5)
+	fmt.Println(x.Has(5))
+
+	// Output:
+	// false
+	// true
+}
+
+func ExampleIntSet_Add() {
+	var x IntSet
+
+	fmt.Println(x.String()) // Empty set.
+
 	x.Add(1)
 	x.Add(144)
 	x.Add(9)
-	x.Add(42)
-
-	//!+note
-	fmt.Println(&x)         // "{1 9 42 144}"
-	fmt.Println(x.String()) // "{1 9 42 144}"
-	fmt.Println(x)          // "{[4398046511618 0 65536]}"
-	//!-note
+	fmt.Println(x.String()) // "{1 9 144}"
 
 	// Output:
-	// {1 9 42 144}
-	// {1 9 42 144}
-	// {[4398046511618 0 65536]}
+	// {}
+	// {1 9 144}
 }
 
 func ExampleIntSet_Len() {
