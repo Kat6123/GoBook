@@ -156,3 +156,101 @@ func ExampleIntSet_Copy() {
 	// {1 12 122}
 	// false
 }
+
+func ExampleIntSet_IntersectWith() {
+	x, y := &IntSet{}, &IntSet{}
+
+	x.Add(1)
+	x.Add(2)
+	x.Add(3) // {1 2 3}
+	fmt.Println(x)
+
+	y.Add(3)
+	y.Add(4)
+	y.Add(1) // {1 3 4}
+	fmt.Println(y)
+
+	x.IntersectWith(y)
+	fmt.Println(x) // Case when length the same.
+
+	x.Add(156)         // {1 3 156}
+	x.IntersectWith(y) // y: {1 3 4}
+	fmt.Println(x)     // Case when len(x) > len(y).
+
+	y.Add(300)
+	x.IntersectWith(y)
+	fmt.Println(x) // Case when len(x) < len(y).
+
+	// Output:
+	// {1 2 3}
+	// {1 3 4}
+	// {1 3}
+	// {1 3}
+	// {1 3}
+}
+
+func ExampleIntSet_DifferenceWith() {
+	x, y := &IntSet{}, &IntSet{}
+
+	x.Add(1)
+	x.Add(2)
+	x.Add(3) // {1 2 3}
+	fmt.Println(x)
+
+	y.Add(3)
+	y.Add(4)
+	y.Add(1) // {1 3 4}
+	fmt.Println(y)
+
+	x.DifferenceWith(y)
+	fmt.Println(x) // Case when length the same.
+
+	x.Add(156)          // {2 156}
+	x.DifferenceWith(y) // y: {1 3 4}
+	fmt.Println(x)      // Case when len(x) > len(y).
+
+	y.Add(156)
+	y.Add(300)
+	x.DifferenceWith(y)
+	fmt.Println(x) // Case when len(x) < len(y).
+
+	// Output:
+	// {1 2 3}
+	// {1 3 4}
+	// {2}
+	// {2 156}
+	// {2}
+}
+
+func ExampleIntSet_SymmetricDifferenceWith() {
+	x, y := &IntSet{}, &IntSet{}
+
+	x.Add(1)
+	x.Add(2)
+	x.Add(3) // {1 2 3}
+	fmt.Println(x)
+
+	y.Add(3)
+	y.Add(4)
+	y.Add(1) // {1 3 4}
+	fmt.Println(y)
+
+	x.SymmetricDifferenceWith(y)
+	fmt.Println(x) // Case when length the same.
+
+	x.Add(156)                   // {2 4 156}
+	x.SymmetricDifferenceWith(y) // y: {1 3 4}
+	fmt.Println(x)               // Case when len(x) > len(y).
+
+	y.Add(156)
+	y.Add(300) // y: {1 3 4 156 300}
+	x.SymmetricDifferenceWith(y)
+	fmt.Println(x) // Case when len(x) < len(y).
+
+	// Output:
+	// {1 2 3}
+	// {1 3 4}
+	// {2 4}
+	// {1 2 3 156}
+	// {2 4 300}
+}

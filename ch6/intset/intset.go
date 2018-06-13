@@ -73,17 +73,6 @@ func (s *IntSet) Add(x int) {
 	s.words[word] |= 1 << bit
 }
 
-// UnionWith sets s to the union of s and t.
-func (s *IntSet) UnionWith(t *IntSet) {
-	for i, tword := range t.words {
-		if i < len(s.words) {
-			s.words[i] |= tword
-		} else {
-			s.words = append(s.words, tword)
-		}
-	}
-}
-
 // String returns the set as a string of the form "{1 2 3}".
 func (s *IntSet) String() string {
 	var buf bytes.Buffer
@@ -103,4 +92,46 @@ func (s *IntSet) String() string {
 	}
 	buf.WriteByte('}')
 	return buf.String()
+}
+
+// UnionWith sets s to the union of s and t.
+func (s *IntSet) UnionWith(t *IntSet) {
+	for i, tword := range t.words {
+		if i < len(s.words) {
+			s.words[i] |= tword
+		} else {
+			s.words = append(s.words, tword)
+		}
+	}
+}
+
+// IntersectWith sets s to the intersection of s and t.
+func (s *IntSet) IntersectWith(t *IntSet) {
+	for i := range s.words {
+		if i >= len(t.words) {
+			s.words[i] = 0
+		} else {
+			s.words[i] &= t.words[i]
+		}
+	}
+}
+
+// DifferenceWith sets s to the difference of s and t.
+func (s *IntSet) DifferenceWith(t *IntSet) {
+	for i := range s.words {
+		if i < len(t.words) {
+			s.words[i] &^= t.words[i]
+		}
+	}
+}
+
+// SymmetricDifferenceWith sets s to the symmetric difference of s and t.
+func (s *IntSet) SymmetricDifferenceWith(t *IntSet) {
+	for i := range t.words {
+		if i >= len(s.words) {
+			s.words = append(s.words, t.words[i])
+		} else {
+			s.words[i] ^= t.words[i]
+		}
+	}
 }
