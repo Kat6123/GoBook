@@ -7,8 +7,6 @@
 package main
 
 import (
-	"math/rand"
-
 	"fmt"
 
 	"bytes"
@@ -45,8 +43,6 @@ func Sort(values []int) {
 	for _, v := range values {
 		root = add(root, v)
 	}
-
-	fmt.Println(root)
 	appendValues(values[:0], root)
 }
 
@@ -77,12 +73,3 @@ func add(t *tree, value int) *tree {
 }
 
 //!-
-
-func main() {
-	data := make([]int, 10)
-	for i := range data {
-		data[i] = rand.Int() % 50
-	}
-	fmt.Println(data)
-	Sort(data)
-}
