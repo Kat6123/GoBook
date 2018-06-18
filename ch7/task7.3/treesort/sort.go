@@ -4,12 +4,39 @@
 // See page 101.
 
 // Package treesort provides insertion sort using an unbalanced binary tree.
-package treesort
+package main
+
+import (
+	"math/rand"
+
+	"fmt"
+
+	"bytes"
+)
 
 //!+
 type tree struct {
 	value       int
 	left, right *tree
+}
+
+func (t *tree) String() string {
+	var buf bytes.Buffer
+
+	buf.WriteString("{ ")
+
+	var printLeaf func(t *tree)
+	printLeaf = func(t *tree) {
+		if t != nil {
+			printLeaf(t.left)
+			fmt.Fprintf(&buf, "%d ", t.value)
+			printLeaf(t.right)
+		}
+	}
+	printLeaf(t)
+
+	buf.WriteString("}")
+	return buf.String()
 }
 
 // Sort sorts values in place.
@@ -18,6 +45,8 @@ func Sort(values []int) {
 	for _, v := range values {
 		root = add(root, v)
 	}
+
+	fmt.Println(root)
 	appendValues(values[:0], root)
 }
 
@@ -48,3 +77,12 @@ func add(t *tree, value int) *tree {
 }
 
 //!-
+
+func main() {
+	data := make([]int, 10)
+	for i := range data {
+		data[i] = rand.Int() % 50
+	}
+	fmt.Println(data)
+	Sort(data)
+}
