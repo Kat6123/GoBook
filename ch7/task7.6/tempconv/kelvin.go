@@ -17,7 +17,10 @@ func (k *Kelvin) Set(s string) (err error) {
 	var unit string
 	var value float64
 
-	fmt.Sscanf(s, "%f%s", value, unit)
+	if _, err := fmt.Sscanf(s, "%f%s", &value, &unit); err != nil {
+		return fmt.Errorf("scan %s", s)
+	}
+
 	switch unit {
 	case "K":
 		*k = Kelvin(value)
@@ -33,7 +36,7 @@ func (k *Kelvin) Set(s string) (err error) {
 			return fmt.Errorf("parse %s as Celsius to set Kelvin: %v", s, err)
 		}
 	default:
-		return fmt.Errorf("wrong temperature %g", value)
+		return fmt.Errorf("wrong temperature type %q in %s", unit, s)
 	}
 	return
 }

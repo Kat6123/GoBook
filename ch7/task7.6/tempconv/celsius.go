@@ -17,7 +17,10 @@ func (c *Celsius) Set(s string) (err error) {
 	var unit string
 	var value float64
 
-	fmt.Sscanf(s, "%f%s", value, unit)
+	if _, err := fmt.Sscanf(s, "%f%s", &value, &unit); err != nil {
+		return fmt.Errorf("scan %s", s)
+	}
+
 	switch unit {
 	case "C", "°C":
 		*c = Celsius(value)
@@ -33,7 +36,7 @@ func (c *Celsius) Set(s string) (err error) {
 			return fmt.Errorf("parse %s as Kelvin to set Celsius: %v", s, err)
 		}
 	default:
-		return fmt.Errorf("wrong temperature type %g", value)
+		return fmt.Errorf("wrong temperature type %q in %s", unit, s)
 	}
 	return
 }
