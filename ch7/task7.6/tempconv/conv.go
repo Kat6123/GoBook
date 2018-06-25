@@ -1,4 +1,4 @@
-// Tempconv package defines:
+// Package tempconv defines:
 // types for different temperatures;
 // methods to use temperatures as command-line flags;
 // methods to convert from one temperature type to another.
@@ -8,32 +8,32 @@ import "fmt"
 
 // CToF converts a Celsius temperature to Fahrenheit.
 func CToF(c Celsius) (Fahrenheit, error) {
-	if c < AbsoluteZeroC {
-		return 0, fmt.Errorf("%s is lower than absolute zero\n", c)
+	if c < absoluteZeroC {
+		return 0, fmt.Errorf("%s is lower than absolute zero", c)
 	}
 	return Fahrenheit(c*9/5 + 32), nil
 }
 
 // FToC converts a Fahrenheit temperature to Celsius.
 func FToC(f Fahrenheit) (Celsius, error) {
-	if f < AbsoluteZeroF {
-		return 0, fmt.Errorf("%s is lower than absolute zero\n", f)
+	if f < absoluteZeroF {
+		return 0, fmt.Errorf("%s is lower than absolute zero", f)
 	}
 	return Celsius((f - 32) * 5 / 9), nil
 }
 
 // CToK converts a Celsius temperature to Kelvin.
 func CToK(c Celsius) (Kelvin, error) {
-	if c < AbsoluteZeroC {
-		return 0, fmt.Errorf("%s is lower than absolute zero\n", c)
+	if c < absoluteZeroC {
+		return 0, fmt.Errorf("%s is lower than absolute zero", c)
 	}
 	return Kelvin(c + 273.15), nil
 }
 
 // KToC converts a Kelvin temperature to Celsius.
 func KToC(k Kelvin) (Celsius, error) {
-	if k < AbsoluteZeroK {
-		return 0, fmt.Errorf("%s is lower than absolute zero\n", k)
+	if k < absoluteZeroK {
+		return 0, fmt.Errorf("%s is lower than absolute zero", k)
 	}
 	return Celsius(k - 273.15), nil
 }

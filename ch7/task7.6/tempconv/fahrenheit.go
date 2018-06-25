@@ -5,32 +5,37 @@ import (
 	"fmt"
 )
 
+// Fahrenheit type contains value of Fahrenheit temp.
 type Fahrenheit float64
 
-const AbsoluteZeroF = -459.67
+const (
+	absoluteZeroF = -459.67
+	fahrenheit    = "F"
+)
 
 func (f Fahrenheit) String() string {
 	return fmt.Sprintf("%g°F", f)
 }
 
+// Set parses input string of temperature in Celsius, Kelvin on Fahrenheit and set value in Fahrenheit.
 func (f *Fahrenheit) Set(s string) (err error) {
 	var unit string
 	var value float64
 
-	if _, err := fmt.Sscanf(s, "%f%s", &value, &unit); err != nil {
+	if _, err = fmt.Sscanf(s, "%f%s", &value, &unit); err != nil {
 		return fmt.Errorf("scan %s", s)
 	}
 
 	switch unit {
-	case "F":
+	case fahrenheit, "°" + fahrenheit:
 		*f = Fahrenheit(value)
 		return nil
-	case "K":
+	case kelvin:
 		*f, err = KToF(Kelvin(value))
 		if err != nil {
 			return fmt.Errorf("parse %s as Kelvin to set Fahrenheit: %v", s, err)
 		}
-	case "C", "°C":
+	case celsius, "°" + celsius:
 		*f, err = CToF(Celsius(value))
 		if err != nil {
 			return fmt.Errorf("parse %s as Celsius to set Fahrenheit: %v", s, err)
@@ -41,6 +46,7 @@ func (f *Fahrenheit) Set(s string) (err error) {
 	return
 }
 
+// FahrenheitFlag defines a tempconv.Fahrenheit flag with specified name, default value, and usage string.
 func FahrenheitFlag(name string, value Fahrenheit, usage string) *Fahrenheit {
 	temp := value
 	flag.CommandLine.Var(&temp, name, usage)
