@@ -13,14 +13,7 @@ type Track struct {
 	Length time.Duration
 }
 
-var tracks = []*Track{
-	{"Go", "Delilah", "From the Roots Up", 2012, length("3m38s")},
-	{"Go", "Moby", "Moby", 1992, length("3m37s")},
-	{"Go Ahead", "Alicia Keys", "As I Am", 2007, length("4m36s")},
-	{"Ready 2 Go", "Martin Solveig", "Smash", 2011, length("4m24s")},
-}
-
-func byTrack(reversed bool) {
+func byTrack(tracks []*Track, reversed bool) {
 	custom := sort.Interface(customSort{
 		tracks,
 		func(x, y *Track) bool { return x.Title < y.Title }})
@@ -32,7 +25,7 @@ func byTrack(reversed bool) {
 	sort.Sort(custom)
 }
 
-func byArtist(reversed bool) {
+func byArtist(tracks []*Track, reversed bool) {
 	custom := sort.Interface(customSort{
 		tracks,
 		func(x, y *Track) bool { return x.Artist < y.Artist }})
