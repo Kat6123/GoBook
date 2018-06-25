@@ -20,25 +20,27 @@ var tracks = []*Track{
 	{"Ready 2 Go", "Martin Solveig", "Smash", 2011, length("4m24s")},
 }
 
-func byTrack() {
-	sort.Sort(
-		customSort{
-			tracks,
-			func(x, y *Track) bool { return x.Title < y.Title }})
+func byTrack(reversed bool) {
+	custom := sort.Interface(customSort{
+		tracks,
+		func(x, y *Track) bool { return x.Title < y.Title }})
+
+	if reversed {
+		custom = sort.Reverse(custom)
+	}
+
+	sort.Sort(custom)
 }
 
-func byArtist() {
-	sort.Sort(
-		customSort{
-			tracks,
-			func(x, y *Track) bool { return x.Artist < y.Artist }})
-}
+func byArtist(reversed bool) {
+	custom := sort.Interface(customSort{
+		tracks,
+		func(x, y *Track) bool { return x.Artist < y.Artist }})
+	if reversed {
+		custom = sort.Reverse(custom)
+	}
 
-func byYear() {
-	sort.Sort(
-		customSort{
-			tracks,
-			func(x, y *Track) bool { return x.Year < y.Year }})
+	sort.Sort(custom)
 }
 
 func length(s string) time.Duration {
