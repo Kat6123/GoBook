@@ -1,0 +1,18 @@
+<table>
+    <tr style='text-align: left'>
+        <th>Title</th>
+        <th>Artist</th>
+        <th>Album</th>
+        <th>Year</th>
+        <th>Length</th>
+    </tr>
+{{range . }}
+    <tr>
+        <td>{{.Title}}</td>
+        <td>{{.Artist}}</td>
+        <td>{{.Album}}</td>
+        <td>{{.Year}}</td>
+        <td>{{.Length}}</td>
+    </tr>
+{{end}}
+</table>
