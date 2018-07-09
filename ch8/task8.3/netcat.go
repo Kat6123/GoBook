@@ -20,31 +20,27 @@ func main() {
 		log.Fatal(err)
 	}
 
-	done := make(chan struct{})
-	go func() {
-		io.Copy(os.Stdout, conn) // NOTE: ignoring errors
-		log.Println("done")
-		done <- struct{}{} // signal the main goroutine
-	}()
-	mustCopy(conn, os.Stdin)
-
-	tcpconn, ok := conn.(*net.TCPConn)
+	tcp, ok := conn.(*net.TCPConn)
 	if !ok {
 		log.Fatalf("able to work only with tcp connection")
 	}
 
-	err = tcpconn.CloseWrite()
+	done := make(chan struct{})
+	go func() {
+		io.Copy(os.Stdout, tcp) // NOTE: ignoring errors
+		log.Println("done")
+		done <- struct{}{} // signal the main goroutine
+	}()
+	mustCopy(tcp, os.Stdin)
+
+	err = tcp.CloseWrite()
 	if err != nil {
 		log.Fatalf("close write tcp connection has failed: %v", err)
 	}
 
 	<-done // wait for background goroutine to finish
 
-	// where close read here or in goroutine? -> error: close read tcp connection has failed: close tcp 127.0.0.1:48776->127.0.0.1:8000: shutdown: transport endpoint is not connected
-	err = tcpconn.CloseRead()
-	if err != nil {
-		log.Fatalf("close read tcp connection has failed: %v", err)
-	}
+	tcp.CloseRead()
 }
 
 //!-
